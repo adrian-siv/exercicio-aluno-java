@@ -14,9 +14,16 @@
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
    </padding>
    <children>
+      <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0">
+         <children>
+            <TextField fx:id="txtNome" promptText="Nome do aluno" />
+            <TextField fx:id="txtTurma" promptText="Turma" />
+            <TextField fx:id="txtRM" promptText="RM" />
+         </children>
+      </VBox>
       <HBox prefHeight="44.0" prefWidth="217.0" spacing="42.0">
          <children>
-            <TextField fx:id="txtNome" onAction="#adicionarAluno" promptText="Nome do aluno" />
+            <TextField onAction="#adicionarAluno" promptText="Nome do aluno" />
             <Button mnemonicParsing="false" onAction="#adicionarAluno" text="Adicionar" />
             <Button mnemonicParsing="false" onAction="#apagarAluno" text="Apagar" />
          </children>

@@ -1,13 +1,15 @@
 package com.example;
 
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert.AlertType;
 
 public class PrimaryController {
     // textField e TextArea são objetos/classes
@@ -15,6 +17,10 @@ public class PrimaryController {
     ListView<Aluno> listAlunos;
     @FXML
     TextField txtNome;
+    @FXML
+    TextField txtTurma;
+    @FXML
+    TextField txtRM;
     @FXML
     RadioButton rdbCrescente;
     @FXML
@@ -27,7 +33,36 @@ public class PrimaryController {
     private ArrayList<Aluno> alunos = new ArrayList<>();
 
     public void adicionarAluno() {
-        var aluno = new Aluno(txtNome.getText(), "1TDSPG", 200399);
+        var aluno = new Aluno(txtNome.getText(), txtTurma.getText(), Integer.valueOf(txtRM.getText()));
+
+        // Conectar com o banco
+        final String HOST = "auth-db719.hstgr.io";
+        final String PORT = "3306";
+        final String DATABASE = "u553405907_fiap";
+        final String USER = "u553405907_fiap";
+        final String PASS = "u553405907_FIAP";
+        final String URL = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE; // JDBC URL
+
+        try {
+            var con = DriverManager.getConnection(URL, USER, PASS);
+
+            var sql = "INSERT INTO alunos (nome, turma, rm) VALUES (?, ?, ?)";
+            var instrucao = con.prepareStatement(sql);
+            instrucao.setString(1, aluno.nome());
+            instrucao.setString(2, aluno.turma());
+            instrucao.setInt(3, aluno.rm());
+            instrucao.executeUpdate();
+
+            Alert alert = new Alert(AlertType.INFORMATION, "Cadastrado com sucesso");
+            alert.show();
+
+            con.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        //
+
         alunos.add(aluno);
         // txtAlunos.appendText(txtNome.getText() + "\n");
         txtNome.clear();
@@ -36,11 +71,32 @@ public class PrimaryController {
     }
 
     public void atualizarAluno() {
-        ordenar();
+        final String HOST = "auth-db719.hstgr.io";
+        final String PORT = "3306";
+        final String DATABASE = "u553405907_fiap";
+        final String USER = "u553405907_fiap";
+        final String PASS = "u553405907_FIAP";
+        final String URL = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE; // JDBC URL
 
-        listAlunos.getItems().clear();
-        for (Aluno aluno : alunos) { // forEach do java
-            listAlunos.getItems().add(aluno);
+        try {
+            var con = DriverManager.getConnection(URL, USER, PASS);
+
+            var sql = "SELECT * FROM alunos ORDER BY nome";
+            var instrucao = con.prepareStatement(sql);
+            var dados = instrucao.executeQuery();
+
+            while(dados.next()) {
+                var aluno = new Aluno(
+                    dados.getString("nome"),
+                    dados.getString("turma"),
+                    dados.getInt("rm")
+                );
+
+                listAlunos.getItems().add(aluno);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
